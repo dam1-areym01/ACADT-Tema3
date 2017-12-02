@@ -1,24 +1,40 @@
 package EJ6;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.sql.*;
+import java.util.Properties;
 import java.util.Scanner;
 
 import com.mysql.jdbc.EscapeTokenizer;
 
+/**
+ * @author Alberto Rey Moreno
+ */
+
 public class Principal {
 
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		conexionBBDD();
+	/**
+	 * Pide al usuario el GESTOR DE BASE DE DATOS
+	 * 
+	 * @return valor del gestor de BBDD
+	 */
+	public static String pedirBBDD() {
+		Scanner scan = new Scanner(System.in);
+		System.out.println("Elija la BBDD [oracle] [mysql] [sqlite]");
+		String base = scan.nextLine();
+		return base;
 	}
 
-	public static void conexionBBDD() {
-
+	/**
+	 * Conecta con el gestor de base de datos y ejecuta los métodos creados.
+	 */
+	public static void getConexionBase() {
 		try {
 
-			Class.forName("com.mysql.jdbc.Driver");
+			String baseDatos = pedirBBDD();
 
-			Connection conexion = DriverManager.getConnection("jdbc:mysql://localhost/acadt", "root", "");
+			Connection conexion = ConexionBBDD.conexionBBDD(baseDatos);
 			DatabaseMetaData dbmd = conexion.getMetaData();
 
 			ResultSet rs = null;
@@ -27,12 +43,19 @@ public class Principal {
 			String url = dbmd.getURL();
 			String usuario = dbmd.getUserName();
 
-			System.out.println("INFORMACIÓN SOBRE LA BASE DE DATOS - MYSQL:");
-			System.out.println("===========================================\n");
+			System.out.println("INFORMACIÓN SOBRE LA BASE DE DATOS " + nombre + ":");
+			System.out.println("============================================");
 			System.out.println("Nombre: " + nombre);
 			System.out.println("Driver: " + driver);
 			System.out.println("URL: " + url);
 			System.out.println("Usuario: " + usuario);
+			System.out.println("");
+
+			if (baseDatos.equalsIgnoreCase("oracle")) {
+				rs = dbmd.getTables(null, "ACADT", null, null);
+			} else {
+				rs = dbmd.getTables(null, "acadt", null, null);
+			}
 
 			while (rs.next()) {
 				String catalogo = rs.getString(1);
@@ -40,30 +63,23 @@ public class Principal {
 				String tabla = rs.getString(3);
 				String tipo = rs.getString(4);
 
-				getColumnaTabla("acadt", esquema, tabla);
-				getClaves(Integer.parseInt(tipo), "acadt", esquema, tabla);
+				AplicacionesTabla.getColumnaTabla(nombre, esquema, tabla, conexion);
+				AplicacionesTabla.getClaves(tipo, nombre, esquema, tabla, conexion);
 			}
-
+			System.out.println("\n");
 			conexion.close();
 
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
 	}
 
-	public static void getColumnaTabla(String bd, String esquema, String tabla) {
-
-		
-		
-	}
-
-	public static void getClaves(int tipo, String bd, String esquema, String tabla) {
-
-		
-		
+	/**
+	 * Main
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		getConexionBase();
 	}
 
 }

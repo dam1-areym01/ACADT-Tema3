@@ -6,13 +6,24 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+/**
+ * @author Alberto Rey Moreno
+ */
+
 public class Principal {
 
+	/**
+	 * Main
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		consultaBD();
 	}
 
+	/**
+	 * Consulta donde se pide que muestre el empleado con el sueldo MAXIMO de la tabla.
+	 */
 	public static void consultaBD() {
 		
 		String query = "SELECT apellido, salario FROM empleados WHERE salario = (SELECT MAX(salario) FROM empleados)";
